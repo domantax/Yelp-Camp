@@ -1,3 +1,4 @@
+// ===================Authentication 
 var express = require('express');
 var router = express.Router();
 var User = require('../models/user');
@@ -10,6 +11,7 @@ router.get("/", function(req, res) {
 
 
 //Auth routes
+
 // show register form route
 router.get("/register", function(req, res){
    res.render("register", {page: "register"}); 
@@ -17,7 +19,7 @@ router.get("/register", function(req, res){
 //handle sign up logic route
 router.post("/register", function(req, res){
     var newUser = new User({username: req.body.username});
-    if (req.body.adminCode === "verysecretproject") {
+    if (req.body.adminCode === process.env.ADMINPASS) {
         newUser.isAdmin = true;
     }
     User.register(newUser, req.body.password, function(err, user){
@@ -40,7 +42,9 @@ router.get("/login", function(req, res){
 router.post("/login", passport.authenticate("local", 
     {
         successRedirect: "/campgrounds",
-        failureRedirect: "/login"
+        failureRedirect: "/login",
+        failureFlash: true,
+        successFlash: 'Welcome to YelpCamp!'
     }), function(req, res){
 });
 
